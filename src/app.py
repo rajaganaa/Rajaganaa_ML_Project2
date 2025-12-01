@@ -1,4 +1,4 @@
-<a href="https://colab.research.google.com/github/rajaganaa/Rajaganaa_ML_Project2/blob/main/ML_2_hospital_readmission_project.ipynb" target="_parent"><img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/></a>
+
 
 #Predicting Hospital Readmissions
 
@@ -9,6 +9,7 @@
 
 import pandas as pd
 import numpy as np
+import os
 
 from sklearn.preprocessing import LabelEncoder, OrdinalEncoder
 
@@ -18,7 +19,12 @@ import seaborn as sns
 import warnings
 warnings.filterwarnings("ignore")
 
-raw_df = pd.read_csv(r"/content/drive/Othercomputers/My Laptop (1)/Desktop/raj007_projects/RAJA_ML_PROJEC_2/synthetic_hospital_readmissions_data.csv")
+# Get the directory of the current script
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(script_dir)
+data_dir = os.path.join(project_root, "data")
+
+raw_df = pd.read_csv(os.path.join(data_dir, "synthetic_hospital_readmissions_data.csv"))
 
 raw_df.head()
 
@@ -91,11 +97,11 @@ raw_df.duplicated().sum()
 ## Save the Dataframe
 
 # Save the Dataframe
-raw_df.to_csv("hospital_readmissions_only_int.csv", index= False)
+raw_df.to_csv(os.path.join(data_dir, "hospital_readmissions_only_int.csv"), index= False)
 
 ## Read the Dataframe
 
-df_1 = pd.read_csv("hospital_readmissions_only_int.csv")
+df_1 = pd.read_csv(os.path.join(data_dir, "hospital_readmissions_only_int.csv"))
 
 df_1.head()
 
@@ -263,11 +269,11 @@ A1C_Not_Null_2.shape
 
 # saving with actual A1C values
 
-A1C_Not_Null_2.to_csv("hospital_with_actual_A1C.csv", index= False)
+A1C_Not_Null_2.to_csv(os.path.join(data_dir, "hospital_with_actual_A1C.csv"), index= False)
 
 #   Model to Predict A1C Values
 
-!pip install xgboost
+
 
 
 # import
@@ -465,14 +471,14 @@ plt.legend(loc= "lower right")
 plt.show()
 
 # Saving the Model unsing pickle
-with open("A1C_Model.pkl","wb") as m:
+with open(os.path.join(data_dir, "A1C_Model.pkl"),"wb") as m:
     pickle.dump(A1C_Model, m)
 
 # --------------------------------------------------------------------------------------------------------------------------------------------------#
 
 ## Read the Dataframe
 
-df_1 = pd.read_csv("hospital_readmissions_only_int.csv")
+df_1 = pd.read_csv(os.path.join(data_dir, "hospital_readmissions_only_int.csv"))
 
 df_1.head()
 
@@ -632,7 +638,7 @@ A1C_Null_2.head()
 import pickle
 
 # Loading the MODEL
-with open("A1C_Model.pkl","rb") as m1:
+with open(os.path.join(data_dir, "A1C_Model.pkl"),"rb") as m1:
     A1C_Model = pickle.load(m1)
 
 new_A1C = A1C_Model.predict(A1C_Null_2)
@@ -652,12 +658,12 @@ A1C_Null_2["A1C_Result"].unique()
 
 # saving with actual A1C values
 
-A1C_Null_2.to_csv("hospital_with_predicted_A1C.csv", index= False)
+A1C_Null_2.to_csv(os.path.join(data_dir, "hospital_with_predicted_A1C.csv"), index= False)
 
 ## Read the Dataframe
 
-df1 = pd.read_csv("hospital_with_actual_A1C.csv")
-df2 = pd.read_csv("hospital_with_predicted_A1C.csv")
+df1 = pd.read_csv(os.path.join(data_dir, "hospital_with_actual_A1C.csv"))
+df2 = pd.read_csv(os.path.join(data_dir, "hospital_with_predicted_A1C.csv"))
 
 # Concatenate the two DataFrames along the rows (axis=0)
 final_df = pd.concat([df1, df2], axis=0)
@@ -690,7 +696,7 @@ for column in final_df.columns:
     print(f"'{column}':\n {unique_values}\n")
 
 # Save the Dataframe
-final_df.to_csv("hospital_readmissions_final.csv", index= False)
+final_df.to_csv(os.path.join(data_dir, "hospital_readmissions_final.csv"), index= False)
 
 ## Handling Outliers
 
@@ -936,7 +942,7 @@ plt.legend(loc= "lower right")
 plt.show()
 
 # Saving the Model unsing pickle
-with open("Readmission_Model.pkl","wb") as m:
+with open(os.path.join(data_dir, "Readmission_Model.pkl"),"wb") as m:
     pickle.dump(Readmission_Model, m)
 
 final_df.head()
@@ -966,9 +972,7 @@ print(min_max_df)
 
 # ---------------------------------------------------------------------------------------------------------------------------------------------------#
 
-!pip install streamlit-option-menu
 
-!pip install streamlit
 # streamlit part
 
 # import
@@ -989,7 +993,12 @@ def predict_readmission(Gender, Admission_Type, Diagnosis, Num_Lab_Procedures,
        Num_Medications, Num_Outpatient_Visits, Num_Inpatient_Visits,
        Num_Emergency_Visits, Num_Diagnoses, A1C_Result):
 
-    with open("Readmission_Model.pkl","rb") as m:
+    # Get the directory of the current script
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
+    data_dir = os.path.join(project_root, "data")
+    
+    with open(os.path.join(data_dir, "Readmission_Model.pkl"),"rb") as m:
         model = pickle.load(m)
 
     data = np.array([[Gender, Admission_Type, Diagnosis, Num_Lab_Procedures,
